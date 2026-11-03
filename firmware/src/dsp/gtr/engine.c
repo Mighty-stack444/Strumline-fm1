@@ -2,7 +2,11 @@
 // From Guitchordi (github.com/stoogs/guitchordi, GPL-3.0-only, commit 9b16934), for Strumline: the
 // voices in the FM-1's .pool RAM, and gm_damp_string() (a string struck again stops ringing first).
 #include <stdint.h>
+#ifdef OM_HOST
 #include <string.h>
+#else
+void *memset(void *d, int c, unsigned n);       /* firmware/src/libc.c: the firmware has no C library */
+#endif
 #include "engine.h"
 #include "pitch-table.h"
 #include "instruments.h"
