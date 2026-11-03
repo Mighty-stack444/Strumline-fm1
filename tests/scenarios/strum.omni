@@ -1,0 +1,135 @@
+# Strumline: the key's chords, their shapes, strumming by hand and by pattern, the bass, the progression
+# (play, presets, step entry, live recording, undo, clear) and saving. b0..b10 the chord keys, w0..w15 strings.
+wait 200
+expect view 0
+expect code 0
+shot boot.png
+# C major: I is C, x32010
+expect fret0_0 255
+expect fret0_1 3
+expect fret0_2 2
+expect fret0_3 0
+expect fret0_4 1
+expect fret0_5 0
+# the white keys strum the chord by hand, string by string
+tapkey w1
+tapkey w2
+tapkey w3
+expect string3 >10
+# ARP off: Freeplay. A chord key selects, silently; the bass (Follow) plays its root while it is held
+tap ARP
+expect par0 0
+key b4 down
+wait 30
+expect code 4
+expect bass 31
+key b4 up
+wait 30
+expect bass 0
+tap ARP
+expect par0 5
+# a chord held: the pattern (Folk) runs, with the bass under it
+key b5 down
+wait 40
+expect running 1
+expect code 5
+expect bass 33
+wait 1200
+shot pattern.png
+key b5 up
+wait 40
+expect running 0
+# ENV held: the 7th (vi7 is code 5 + 11)
+press ENV
+key b5 down
+wait 40
+expect code 16
+key b5 up
+release ENV
+wait 40
+# the key: PRESETS one turn, C minor; its III is Eb
+turn PRESET 1
+expect par18 1
+key b2 down
+wait 30
+expect code 2
+key b2 up
+turn PRESET -1
+expect par18 0
+# ---- the progression: the default is I V vi IV over 4 bars (96 BPM: a bar is 2.5 s)
+tap PLAY
+expect playing 1
+expect code 0
+wait 2600
+expect code 4
+wait 2500
+expect code 5
+shot playing.png
+tap PLAY
+expect playing 0
+wait 300
+# a preset (Song page, KNOB 2): Jazz ii-V-I is the fifth
+tap SEQ
+expect view 3
+spin K2 4
+expect prog0 13
+expect prog2 8
+expect prog4 12
+shot song.png
+# undo, and redo
+tap LFO
+expect prog0 1
+tap LFO
+expect prog0 13
+# ---- step entry, half bars (Song KNOB 3): vi, IV, rest (the chord goes on), V
+spin K3 1
+expect par13 1
+tap REC
+expect stepmode 1
+expect cursor 0
+tapkey b5
+tapkey b3
+expect prog0 6
+expect prog1 4
+expect cursor 2
+tap LFO
+expect prog2 0
+expect cursor 3
+tapkey b4
+expect prog3 5
+shot step.png
+tap REC
+expect stepmode 0
+# ---- live recording: count-in off (Setup KNOB 2), REC (step entry) then PLAY records
+tap GLO
+spin K2 -1
+expect par15 0
+tap REC
+tap PLAY
+expect recording 1
+wait 1200
+key b1 down
+wait 100
+key b1 up
+tap PLAY
+expect recording 0
+expect prog1 2
+# LFO held: the progression cleared; LFO: undo
+press LFO
+wait 1600
+release LFO
+expect prog0 0
+tap LFO
+expect prog0 6
+# the shapes follow the tuning: Drop D (Setup KNOB 1), D (V7 of G... here II7 of C is D7): its low string
+spin K1 1
+expect par16 1
+# ---- it saves by itself when quiet, and comes back after a restart
+wait 6000
+expect dirty 0
+reboot
+wait 100
+expect prog0 6
+expect par16 1
+expect par13 1
+shot after_reboot.png
